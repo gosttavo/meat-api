@@ -24,7 +24,7 @@ class ModelRouter extends router_1.Router {
         };
         //filtrar models pelo id
         this.doFindById = (req, resp, next) => {
-            this.model.findById(req.params.id)
+            this.doPrepareOne(this.model.findById(req.params.id))
                 .then(this.render(resp, next))
                 .catch(next);
         };
@@ -78,6 +78,9 @@ class ModelRouter extends router_1.Router {
                 return next();
             }).catch(next);
         };
+    }
+    doPrepareOne(query) {
+        return query;
     }
 }
 exports.ModelRouter = ModelRouter;

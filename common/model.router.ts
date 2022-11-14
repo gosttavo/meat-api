@@ -8,6 +8,10 @@ export abstract class ModelRouter<D extends mongoose.Document> extends Router {
         super();
     }
 
+    protected doPrepareOne(query: mongoose.DocumentQuery<D,D>): mongoose.DocumentQuery<D,D>{
+        return query;
+    }
+
     //validar object id
     doValidateId = (req, resp, next) => {
         if(!mongoose.Types.ObjectId.isValid(req.params.id)){
@@ -24,7 +28,7 @@ export abstract class ModelRouter<D extends mongoose.Document> extends Router {
     }
     //filtrar models pelo id
     doFindById = (req, resp, next) => {
-        this.model.findById(req.params.id)
+        this.doPrepareOne(this.model.findById(req.params.id))
             .then(this.render(resp, next))
             .catch(next);
     }
