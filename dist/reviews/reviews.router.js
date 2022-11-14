@@ -11,14 +11,20 @@ class ReviewsRouter extends model_router_1.ModelRouter {
         return query.populate('user', 'name') //popular o name do user e o user
             .populate('restaurant'); //popular restaurant;
     }
+    doEnvelope(document) {
+        let resource = super.doEnvelope(document);
+        const restaurantId = document.restaurant._id ? document.restaurant._id : document.restaurant;
+        resource._links.restaurant = `restaurant/${restaurantId}`;
+        return resource;
+    }
     //vai criar as rotas
     applyRoutes(application) {
         //rota de usuários
-        application.get('/reviews', this.doFindAll);
+        application.get(`${this.basePath}`, this.doFindAll);
         //rota de usuários filtrados pelo id]
-        application.get('/reviews/:id', [this.doValidateId, this.doFindById]);
+        application.get(`${this.basePath}:id`, [this.doValidateId, this.doFindById]);
         //rota para adicionar usuários
-        application.post('/reviews', this.doSave);
+        application.post(`${this.basePath}`, this.doSave);
     }
 }
 exports.reviewRouter = new ReviewsRouter();

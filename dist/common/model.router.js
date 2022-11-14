@@ -78,9 +78,17 @@ class ModelRouter extends router_1.Router {
                 return next();
             }).catch(next);
         };
+        this.basePath = `/${model.collection.name}`;
     }
     doPrepareOne(query) {
         return query;
+    }
+    //vai envelopar as informções de collection e id p/ criar um hiperlink
+    //com o id do recurso em especifico
+    doEnvelope(document) {
+        let resource = Object.assign({ _links: {} }, document.toJSON());
+        resource._links.self = `${this.basePath}/${resource._id}`;
+        return resource;
     }
 }
 exports.ModelRouter = ModelRouter;

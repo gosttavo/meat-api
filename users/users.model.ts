@@ -10,6 +10,10 @@ export interface User extends mongoose.Document {
     password: string
 }
 
+export interface UserModel extends mongoose.Model<User> {
+    doFindByEmail(email: string): Promise<User>;
+}
+
 //metadados do documento
 //atributos do usuário
 const userSchema = new mongoose.Schema({
@@ -43,7 +47,11 @@ const userSchema = new mongoose.Schema({
             message: '{PATH}: Invalid CPF ({VALUE})'
         }
     }
-})
+});
+
+userSchema.statics.doFindByEmail = function(email: string) {
+    return this.findOne({email});
+}
 
 //#region == MIDDLEWARES CRIPTOGRAFIA DE SENHA==
 
@@ -81,4 +89,4 @@ userSchema.pre('update', doUpdateMiddleware);
 //#endregion
 
 //vai exportar o modelo usuário -> classe
-export const User = mongoose.model<User>('User', userSchema);
+export const User = mongoose.model<User, UserModel>('User', userSchema);

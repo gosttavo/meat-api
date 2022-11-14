@@ -38,6 +38,9 @@ const userSchema = new mongoose.Schema({
         }
     }
 });
+userSchema.statics.doFindByEmail = function (email) {
+    return this.findOne({ email });
+};
 //#region == MIDDLEWARES CRIPTOGRAFIA DE SENHA==
 const doHashPassword = (obj, next) => {
     bcrypt.hash(obj.password, environment_1.environment.security.saltRounds)
