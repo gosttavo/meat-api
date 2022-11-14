@@ -41,6 +41,7 @@ class UserRouter extends Router {
         //rota para fazer update em usuários
         application.put('/users/:id', (req, resp, next) => {
             const options = {
+                runValidators: true,
                 overwrite: true //vai fazer com o update seja completo
             };
             //filtro, modificação, parametros customizados
@@ -60,7 +61,7 @@ class UserRouter extends Router {
         //rota p update parcial de usuários
         application.patch('/users/:id', (req, resp, next) => {
             //constante para mandar o documento novo p/ ser modificado
-            const options = { new: true };
+            const options = { runValidators: true, new: true };
 
             User.findByIdAndUpdate(req.params.id, req.body, options)
                 .then(this.render(resp, next))

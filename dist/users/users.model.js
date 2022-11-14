@@ -1,7 +1,9 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const mongoose = require("mongoose");
+const bcrypt = require("bcrypt");
 const validators_1 = require("../common/validators");
+const environment_1 = require("../common/environment");
 //metadados do documento
 //atributos do usuário
 const userSchema = new mongoose.Schema({
@@ -36,5 +38,38 @@ const userSchema = new mongoose.Schema({
         }
     }
 });
+//#region == MIDDLEWARES CRIPTOGRAFIA DE SENHA==
+const doHashPassword = (obj, next) => {
+    bcrypt.hash(obj.password, environment_1.environment.security.saltRounds)
+        .then(hash => {
+        obj.password = hash;
+        next();
+    })
+        .catch(next);
+};
+//post
+const doSaveMiddleware = function (next) {
+    const user = this;
+    if (!user.isModified('password')) {
+        next();
+    }
+    else {
+        doHashPassword(user, next);
+    }
+};
+//put e patch
+const doUpdateMiddleware = function (next) {
+    if (!this.getUpdate().password) {
+        next();
+    }
+    else {
+        doHashPassword(this.getUpdate(), next);
+    }
+};
+//middlewares
+userSchema.pre('save', doSaveMiddleware);
+userSchema.pre('findOneAndUpdate', doUpdateMiddleware);
+userSchema.pre('update', doUpdateMiddleware);
+//#endregion
 //vai exportar o modelo usuário -> classe
 exports.User = mongoose.model('User', userSchema);

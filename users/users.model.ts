@@ -1,5 +1,8 @@
 import * as mongoose from 'mongoose';
+import * as bcrypt from 'bcrypt';
+
 import { doValidateCPF } from '../common/validators';
+import { environment } from '../common/environment';
 
 export interface User extends mongoose.Document {
     name: string,
@@ -20,7 +23,7 @@ const userSchema = new mongoose.Schema({
         type: String,
         unique: true,
         required: true,
-        match:  /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/
+        match: /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/
     },
     password: {
         type: String,
@@ -33,14 +36,49 @@ const userSchema = new mongoose.Schema({
         enum: ['Male', 'Female', 'Attack-Helicopter']
     },
     cpf: {
-       type: String,
-       required: false,
-       validate: {
-        validator: doValidateCPF,
-        message: '{PATH}: Invalid CPF ({VALUE})'
-       } 
+        type: String,
+        required: false,
+        validate: {
+            validator: doValidateCPF,
+            message: '{PATH}: Invalid CPF ({VALUE})'
+        }
     }
 })
+
+//#region == MIDDLEWARES CRIPTOGRAFIA DE SENHA==
+
+const doHashPassword = (obj, next) => {
+    bcrypt.hash(obj.password, environment.security.saltRounds)
+    .then(hash => {
+        obj.password = hash;
+        next();
+    })
+    .catch(next);
+}
+//post
+const doSaveMiddleware = function (next) {
+    const user: User = this;
+
+    if (!user.isModified('password')) {
+        next();
+    } else {
+        doHashPassword(user, next);
+    }
+}
+//put e patch
+const doUpdateMiddleware = function (next) {
+    if (!this.getUpdate().password) {
+        next();
+    } else {
+        doHashPassword(this.getUpdate(), next);
+    }
+}
+//middlewares
+userSchema.pre('save', doSaveMiddleware);
+userSchema.pre('findOneAndUpdate', doUpdateMiddleware);
+userSchema.pre('update', doUpdateMiddleware);
+
+//#endregion
 
 //vai exportar o modelo usuário -> classe
 export const User = mongoose.model<User>('User', userSchema);
