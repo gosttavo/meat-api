@@ -48,5 +48,8 @@ class Server {
         return this.doInitDatabase()
             .then(() => this.doInitRoutes(routers).then(() => this));
     }
+    shutdown() {
+        return mongoose.disconnect().then(() => this.application.close());
+    }
 }
 exports.Server = Server;

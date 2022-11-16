@@ -6,26 +6,52 @@ export abstract class ModelRouter<D extends mongoose.Document> extends Router {
 
     basePath: string;
 
+    pageSize: number = 4;
+
     constructor(protected model: mongoose.Model<D>) {
         super();
-        this.basePath = `/${model.collection.name}`;  
+        this.basePath = `/${model.collection.name}`;
     }
 
-    protected doPrepareOne(query: mongoose.DocumentQuery<D,D>): mongoose.DocumentQuery<D,D>{
+    protected doPrepareOne(query: mongoose.DocumentQuery<D, D>): mongoose.DocumentQuery<D, D> {
         return query;
     }
 
-    //vai envelopar as informções de collection e id p/ criar um hiperlink
+    //vai envelopar as informações de collection e id p/ criar um hiperlink
     //com o id do recurso em especifico
     doEnvelope(document: any): any {
-        let resource = Object.assign({_links: {}}, document.toJSON());
+        let resource = Object.assign({ _links: {} }, document.toJSON());
         resource._links.self = `${this.basePath}/${resource._id}`;
         return resource;
     }
+    //vai envelopar as informaçõs de contagem de páginas
+    doEnvelopeAll(documents: any[], options: any = {}): any {
+        const resource: any = {
+            _links: {
+                self: `${options.url}`,
+            },
+            items: documents
+        }
 
+        //se todos os parametros forem passados com sucesso faz validações
+        if (options.page && options.count && options.pageSize) {
+            //só vai mostrar a previous page em páginas maiores que 1
+            if (options.page > 1) {
+                resource._links.previous = `${this.basePath}?_page=${options.page - 1}`;
+            }
+            //constante que vai contar quantos itens faltam para terminar a listagem
+            const remaining = options.count - (options.page * options.pageSize)
+            //se for mais que 0, mostrará a nova página
+            if (remaining > 0) {
+                resource._links.next = `${this.basePath}?_page=${options.page + 1}`;
+            }
+        }
+
+        return resource;
+    }
     //validar object id
     doValidateId = (req, resp, next) => {
-        if(!mongoose.Types.ObjectId.isValid(req.params.id)){
+        if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
             next(new NotFoundError('Document not found'));
         } else {
             next();
@@ -33,9 +59,21 @@ export abstract class ModelRouter<D extends mongoose.Document> extends Router {
     }
     //vai encontrar todos os modelos
     doFindAll = (req, resp, next) => {
-        this.model.find()
-            .then(this.renderAll(resp, next))
-            .catch(next);
+        //vai receber a página da req, por padrão é 1
+        let page = parseInt(req.query._page || 1);
+        //se a página for menor ou igual a 0 será 1
+        page = page > 0 ? page : 1;
+        //constante pra auxiliar na hora de skipar a página
+        const skip = (page - 1) * this.pageSize;
+
+        //vai contar as páginas
+        this.model.count({}).exec().then(count => this.model
+            .find()
+            .skip(skip)
+            .limit(this.pageSize)
+            .then(this.renderAll(resp, next, {
+                page, count, pageSize: this.pageSize, url: req.url
+            }))).catch(next);
     }
     //filtrar models pelo id
     doFindById = (req, resp, next) => {

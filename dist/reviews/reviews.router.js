@@ -22,7 +22,7 @@ class ReviewsRouter extends model_router_1.ModelRouter {
         //rota de usuários
         application.get(`${this.basePath}`, this.doFindAll);
         //rota de usuários filtrados pelo id]
-        application.get(`${this.basePath}:id`, [this.doValidateId, this.doFindById]);
+        application.get(`${this.basePath}/:id`, [this.doValidateId, this.doFindById]);
         //rota para adicionar usuários
         application.post(`${this.basePath}`, this.doSave);
     }

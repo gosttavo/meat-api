@@ -36,15 +36,15 @@ class UserRouter extends ModelRouter<User> {
         //rota de usuários -> versão 1.0.0
         application.get({ path: `${this.basePath}`, version: '1.0.0' }, this.doFindAll);
         //rota de usuários filtrados pelo id]
-        application.get(`${this.basePath}:id`, [this.doValidateId, this.doFindById]);
+        application.get(`${this.basePath}/:id`, [this.doValidateId, this.doFindById]);
         //rota para adicionar usuários
         application.post(`${this.basePath}`, this.doSave);
         //rota para fazer update em usuários
-        application.put(`${this.basePath}:id`, [this.doValidateId, this.doReplace]);
+        application.put(`${this.basePath}/:id`, [this.doValidateId, this.doReplace]);
         //rota p update parcial de usuários
-        application.patch(`${this.basePath}:id`, [this.doValidateId, this.doUpdate]);
+        application.patch(`${this.basePath}/:id`, [this.doValidateId, this.doUpdate]);
         //rota para deletar usuário
-        application.del(`${this.basePath}:id`, [this.doValidateId, this.doDelete]);
+        application.del(`${this.basePath}/:id`, [this.doValidateId, this.doDelete]);
     }
 }
 

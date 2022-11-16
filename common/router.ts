@@ -10,6 +10,10 @@ export abstract class Router extends EventEmitter {
         return document;
     }
 
+    doEnvelopeAll(documents: any[], options: any = {}): any {
+        return documents;
+    }
+
     //renderizar um documento sozinho
     render(response: restify.Response, next: restify.Next) {
         return (document) => {
@@ -24,16 +28,16 @@ export abstract class Router extends EventEmitter {
     }
 
     //renderizar um array de documentos
-    renderAll(response: restify.Response, next: restify.Next) {
+    renderAll(response: restify.Response, next: restify.Next, options: any = {}) {
         return (documents: any[]) => {
             if (documents) {
                 documents.forEach((document, index, array) => {
                     this.emit('beforeRender', document);
                     array[index] = this.doEnvelope(document);
                 })
-                response.json(documents);
+                response.json(this.doEnvelopeAll(documents, options));
             } else {
-                response.json([]);
+                response.json(this.doEnvelopeAll([]));
             }
             return next();
         }
