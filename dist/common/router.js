@@ -19,7 +19,7 @@ class Router extends events_1.EventEmitter {
             else {
                 response.send(404);
             }
-            return next();
+            return next(false);
         };
     }
     //renderizar um array de documentos

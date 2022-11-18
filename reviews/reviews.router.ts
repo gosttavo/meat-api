@@ -2,6 +2,7 @@ import * as restify from 'restify';
 import * as mongoose from 'mongoose';
 import { ModelRouter } from '../common/model.router';
 import { Review } from './reviews.model';
+import { authorize } from '../security/authz.handler';
 
 class ReviewsRouter extends ModelRouter<Review>{
     constructor() {
@@ -29,7 +30,9 @@ class ReviewsRouter extends ModelRouter<Review>{
         //rota de usuários filtrados pelo id]
         application.get(`${this.basePath}/:id`, [this.doValidateId, this.doFindById]);
         //rota para adicionar usuários
-        application.post(`${this.basePath}`, this.doSave);
+        application.post(`${this.basePath}`, 
+            [authorize('user'), 
+            this.doSave]);
     }
 }
 

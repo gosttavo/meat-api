@@ -123,7 +123,7 @@ export abstract class ModelRouter<D extends mongoose.Document> extends Router {
             if (cmdResult.result.n) {
                 resp.send(204);
             } else {
-                throw new NotFoundError('documento não encontrado');;
+                throw new NotFoundError('documento não encontrado');
             }
             return next();
         }).catch(next);

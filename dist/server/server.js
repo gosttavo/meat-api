@@ -2,9 +2,11 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const restify = require("restify");
 const environment_1 = require("../common/environment");
+const fs = require("fs");
 const mongoose = require("mongoose");
 const merge_path_parser_1 = require("./merge-path.parser");
 const error_handler_1 = require("./error.handler");
+const token_parser_1 = require("../security/token.parser");
 class Server {
     //método pra iniciar o mongo db
     doInitDatabase() {
@@ -19,12 +21,15 @@ class Server {
                 //criar servidor
                 this.application = restify.createServer({
                     name: 'meat-api',
-                    version: '1.0.0'
+                    version: '1.0.0',
+                    certificate: fs.readFileSync('./security/keys/cert.pem'),
+                    key: fs.readFileSync('./security/keys/key.pem'),
                 });
                 //método p receber os params das urls das queries
                 this.application.use(restify.plugins.queryParser());
                 this.application.use(restify.plugins.bodyParser());
                 this.application.use(merge_path_parser_1.mergePatchBodyParser);
+                this.application.use(token_parser_1.tokenParser);
                 //rotas
                 for (let router of routers) {
                     router.applyRoutes(this.application);

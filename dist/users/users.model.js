@@ -36,10 +36,24 @@ const userSchema = new mongoose.Schema({
             validator: validators_1.doValidateCPF,
             message: '{PATH}: Invalid CPF ({VALUE})'
         }
+    },
+    profiles: {
+        type: [String],
+        required: false
     }
 });
-userSchema.statics.doFindByEmail = function (email) {
-    return this.findOne({ email });
+userSchema.statics.doFindByEmail = function (email, projection) {
+    return this.findOne({ email }, projection);
+};
+//método p/ comparar as senhas
+userSchema.methods.matches = function (password) {
+    //vai comparar a senha passada com a hash da senha do banco
+    return bcrypt.compareSync(password, this.password);
+};
+//método que vai retonar true se o profile estiver na lista de profiles
+userSchema.methods.hasAny = function (...profiles) {
+    //se o profile recebido faz parte do grupo de profiles dos usuários
+    return profiles.some(profile => this.profile.indexOf(profile) !== -1);
 };
 //#region == MIDDLEWARES CRIPTOGRAFIA DE SENHA==
 const doHashPassword = (obj, next) => {

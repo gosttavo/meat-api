@@ -2,9 +2,12 @@ import * as restify from 'restify';
 import { environment } from '../common/environment';
 import { Router } from '../common/router';
 
+import * as fs from 'fs';
+
 import * as mongoose from 'mongoose';
 import { mergePatchBodyParser } from './merge-path.parser';
 import { handleError } from './error.handler';
+import { tokenParser } from '../security/token.parser';
 
 export class Server {
 
@@ -25,13 +28,16 @@ export class Server {
                 //criar servidor
                 this.application = restify.createServer({
                     name: 'meat-api',
-                    version: '1.0.0'
+                    version: '1.0.0',
+                    certificate: fs.readFileSync('./security/keys/cert.pem'),
+                    key: fs.readFileSync('./security/keys/key.pem'),
                 });
 
                 //método p receber os params das urls das queries
                 this.application.use(restify.plugins.queryParser());
                 this.application.use(restify.plugins.bodyParser());
                 this.application.use(mergePatchBodyParser);
+                this.application.use(tokenParser);
 
                 //rotas
                 for (let router of routers) {

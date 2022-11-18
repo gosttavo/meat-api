@@ -85,7 +85,6 @@ class ModelRouter extends router_1.Router {
                 }
                 else {
                     throw new restify_errors_1.NotFoundError('documento não encontrado');
-                    ;
                 }
                 return next();
             }).catch(next);

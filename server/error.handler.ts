@@ -29,6 +29,7 @@ export const handleError = (req: restify.Request, resp: restify.Response, err, d
 
             //retornar lista de erros
             err.toJSON = () => ({
+                message: 'Validation error while processing your request',
                 errors: messages
             });
 

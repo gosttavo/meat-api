@@ -1,6 +1,7 @@
 import * as restify from "restify";
 import { NotFoundError } from "restify-errors";
 import { ModelRouter } from "../common/model.router";
+import { authorize } from "../security/authz.handler";
 import { Restaurant } from "./restaurants.model";
 
 class RestaurantsRouter extends ModelRouter<Restaurant> {
@@ -47,21 +48,45 @@ class RestaurantsRouter extends ModelRouter<Restaurant> {
 
         //rota de restaurants
         application.get(`${this.basePath}`, this.doFindAll);
+
         //rota de restaurants filtrados pelo id]
-        application.get(`${this.basePath}/:id`, [this.doValidateId, this.doFindById]);
+        application.get(`${this.basePath}/:id`, 
+            [this.doValidateId, 
+            this.doFindById]);
+
         //rota para adicionar restaurants
-        application.post(`${this.basePath}`, this.doSave);
+        application.post(`${this.basePath}`, 
+            [authorize('admin'),
+            this.doSave]);
+
         //rota para fazer update em restaurants
-        application.put(`${this.basePath}/:id`, [this.doValidateId, this.doReplace]);
+        application.put(`${this.basePath}/:id`, 
+            [authorize('admin'), 
+            this.doValidateId, 
+            this.doReplace]);
+
         //rota p update parcial de restaurants
-        application.patch(`${this.basePath}/:id`, [this.doValidateId, this.doUpdate]);
+        application.patch(`${this.basePath}/:id`, 
+            [authorize('admin'), 
+            this.doValidateId, 
+            this.doUpdate]);
+
         //rota para deletar restaurants
-        application.del(`${this.basePath}/:id`, [this.doValidateId, this.doDelete]);
+        application.del(`${this.basePath}/:id`, 
+            [authorize('admin'), 
+            this.doValidateId, 
+            this.doDelete]);
 
         //rota de restaurants
-        application.get(`${this.basePath}/:id/menu`, [this.doValidateId, this.doFindMenu]);
+        application.get(`${this.basePath}/:id/menu`, 
+            [this.doValidateId, 
+            this.doFindMenu]);
+
         //rota alteração itens do menu
-        application.put(`${this.basePath}/:id/menu`, [this.doValidateId, this.doReplaceMenu]);
+        application.put(`${this.basePath}/:id/menu`, 
+            [authorize('admin'),
+            this.doValidateId, 
+            this.doReplaceMenu]);
     }
 }
 
