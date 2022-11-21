@@ -50,42 +50,42 @@ class RestaurantsRouter extends ModelRouter<Restaurant> {
         application.get(`${this.basePath}`, this.doFindAll);
 
         //rota de restaurants filtrados pelo id]
-        application.get(`${this.basePath}/:id`, 
-            [this.doValidateId, 
+        application.get(`${this.basePath}/:id`,
+            [this.doValidateId,
             this.doFindById]);
 
         //rota para adicionar restaurants
-        application.post(`${this.basePath}`, 
+        application.post(`${this.basePath}`,
             [authorize('admin'),
             this.doSave]);
 
         //rota para fazer update em restaurants
-        application.put(`${this.basePath}/:id`, 
-            [authorize('admin'), 
-            this.doValidateId, 
+        application.put(`${this.basePath}/:id`,
+            [authorize('admin'),
+            this.doValidateId,
             this.doReplace]);
 
         //rota p update parcial de restaurants
-        application.patch(`${this.basePath}/:id`, 
-            [authorize('admin'), 
-            this.doValidateId, 
+        application.patch(`${this.basePath}/:id`,
+            [authorize('admin'),
+            this.doValidateId,
             this.doUpdate]);
 
         //rota para deletar restaurants
-        application.del(`${this.basePath}/:id`, 
-            [authorize('admin'), 
-            this.doValidateId, 
+        application.del(`${this.basePath}/:id`,
+            [authorize('admin'),
+            this.doValidateId,
             this.doDelete]);
 
         //rota de restaurants
-        application.get(`${this.basePath}/:id/menu`, 
-            [this.doValidateId, 
+        application.get(`${this.basePath}/:id/menu`,
+            [this.doValidateId,
             this.doFindMenu]);
 
         //rota alteração itens do menu
-        application.put(`${this.basePath}/:id/menu`, 
+        application.put(`${this.basePath}/:id/menu`,
             [authorize('admin'),
-            this.doValidateId, 
+            this.doValidateId,
             this.doReplaceMenu]);
     }
 }

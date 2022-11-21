@@ -14,14 +14,18 @@ export const authenticate: restify.RequestHandler = (req, resp, next) => {
         //se usuário e senha existirem
         if (user && user.matches(password)) {
             //gerar token
-            const token = jwt.sign({ sub: user.email, 
-                                     iss: 'meat-api' },
-                          environment.security.apiSecret);
+            const token = jwt.sign({
+                sub: user.email,
+                iss: 'meat-api'
+            },
+                environment.security.apiSecret);
 
             //resposta + token acesso
-            resp.json({ name: user.name, 
-                        email: user.email, 
-                        accessToken: token });
+            resp.json({
+                name: user.name,
+                email: user.email,
+                accessToken: token
+            });
 
             return next(false);
         } else {

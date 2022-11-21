@@ -9,7 +9,7 @@ export interface User extends mongoose.Document {
     email: string,
     password: string
     cpf: string,
-    gender: string, 
+    gender: string,
     profiles: string[],
     matches(password: string): boolean,
     hasAny(...profiles: string[]): boolean
@@ -58,18 +58,18 @@ const userSchema = new mongoose.Schema({
     }
 });
 
-userSchema.statics.doFindByEmail = function(email: string, projection: string) {
-    return this.findOne({email}, projection);
+userSchema.statics.doFindByEmail = function (email: string, projection: string) {
+    return this.findOne({ email }, projection);
 }
 
 //método p/ comparar as senhas
-userSchema.methods.matches = function(password: string): boolean{
+userSchema.methods.matches = function (password: string): boolean {
     //vai comparar a senha passada com a hash da senha do banco
     return bcrypt.compareSync(password, this.password);
 }
 
 //método que vai retonar true se o profile estiver na lista de profiles
-userSchema.methods.hasAny = function(...profiles: string[]): boolean {
+userSchema.methods.hasAny = function (...profiles: string[]): boolean {
     //se o profile recebido faz parte do grupo de profiles dos usuários
     return profiles.some(profile => this.profiles.indexOf(profile) !== -1);
 }
@@ -78,11 +78,11 @@ userSchema.methods.hasAny = function(...profiles: string[]): boolean {
 
 const doHashPassword = (obj, next) => {
     bcrypt.hash(obj.password, environment.security.saltRounds)
-    .then(hash => {
-        obj.password = hash;
-        next();
-    })
-    .catch(next);
+        .then(hash => {
+            obj.password = hash;
+            next();
+        })
+        .catch(next);
 }
 //post
 const doSaveMiddleware = function (next) {

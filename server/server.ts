@@ -8,6 +8,7 @@ import * as mongoose from 'mongoose';
 import { mergePatchBodyParser } from './merge-path.parser';
 import { handleError } from './error.handler';
 import { tokenParser } from '../security/token.parser';
+import { logger } from '../common/logger';
 
 export class Server {
 
@@ -28,6 +29,7 @@ export class Server {
                 const options: restify.ServerOptions = {
                     name: 'meat-api',
                     version: '1.0.0',
+                    log: logger
                 }
 
                 if(environment.security.enableHttps){
@@ -37,6 +39,10 @@ export class Server {
 
                 //criar servidor
                 this.application = restify.createServer(options);
+
+                this.application.pre(restify.plugins.requestLogger({
+                    log: logger
+                }));
 
                 //método p receber os params das urls das queries
                 this.application.use(restify.plugins.queryParser());
@@ -57,6 +63,11 @@ export class Server {
 
                 //tratamento de erros
                 this.application.on('restifyError', handleError);
+                //log
+                // this.application.on('after', restify.plugins.auditLogger({
+                //     log: logger,
+                //     event: 'after'
+                // }));
             }
             catch (error) {
                 reject(error);

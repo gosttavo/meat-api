@@ -16,19 +16,19 @@ const beforeAllTests = () => {
     environment.server.port = process.env.SERVER_PORT || 3001;
     server = new Server();
     return server.bootstrap([userRouter, reviewRouter, restaurantRouter])
-    .then(() => User.remove({}).exec())
-    .then(() => {
-        let admin = new User();
+        .then(() => User.remove({}).exec())
+        .then(() => {
+            let admin = new User();
 
-        admin.name = 'admin';
-        admin.email = 'admin@gmail.com';
-        admin.password = '123';
-        admin.profiles = ['admin', 'user'];
-        
-        return admin.save();
-    })
-    .then(() => Review.remove({}).exec())
-    .then(() => Restaurant.remove({}).exec())
+            admin.name = 'admin';
+            admin.email = 'admin@gmail.com';
+            admin.password = '123';
+            admin.profiles = ['admin', 'user'];
+
+            return admin.save();
+        })
+        .then(() => Review.remove({}).exec())
+        .then(() => Restaurant.remove({}).exec())
 }
 
 const afterAllTests = () => {
@@ -37,9 +37,9 @@ const afterAllTests = () => {
 
 //startup
 beforeAllTests()
-.then(() => jestCli.run())
-.then(() => afterAllTests())
-.catch(error => {
-    console.error(error);
-    process.exit(1);
-});
+    .then(() => jestCli.run())
+    .then(() => afterAllTests())
+    .catch(error => {
+        console.error(error);
+        process.exit(1);
+    });
