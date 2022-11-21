@@ -53,7 +53,7 @@ userSchema.methods.matches = function (password) {
 //método que vai retonar true se o profile estiver na lista de profiles
 userSchema.methods.hasAny = function (...profiles) {
     //se o profile recebido faz parte do grupo de profiles dos usuários
-    return profiles.some(profile => this.profile.indexOf(profile) !== -1);
+    return profiles.some(profile => this.profiles.indexOf(profile) !== -1);
 };
 //#region == MIDDLEWARES CRIPTOGRAFIA DE SENHA==
 const doHashPassword = (obj, next) => {

@@ -1,13 +1,15 @@
 import 'jest';
 import * as request from 'supertest';
 
-let address: string = (<any>global).address;
+const address: string = (<any>global).address;
+const auth: string = (<any>global).auth;
 
 //#region === TESTES GET ===
 
 test('get - 200 /users', () => {
     return request(address)
         .get('/users')
+        .set('Authorization', auth)
         .then(response => {
             expect(response.status).toBe(200);
             expect(response.body.items).toBeInstanceOf(Array);
@@ -17,6 +19,7 @@ test('get - 200 /users', () => {
 test('get - 404 /users/aaaa - not found', () => {
     return request(address)
         .get('/users/aaaa')
+        .set('Authorization', auth)
         .then(response => {
             expect(response.status).toBe(404);
         }).catch(fail);
@@ -25,14 +28,16 @@ test('get - 404 /users/aaaa - not found', () => {
 test('get - 200 /users/:id - find by email', () => {
     return request(address)
         .post('/users')
+        .set('Authorization', auth)
         .send({
             name: 'user',
             email: 'user@gmail.com',
             password: '123'
         })
         .then(response => request(address)
-        .get('/users')
-        .query({email: 'user@gmail.com'}))
+            .get('/users')
+            .set('Authorization', auth)
+            .query({ email: 'user@gmail.com' }))
         .then(response => {
             expect(response.status).toBe(200);
             expect(response.body.items).toBeInstanceOf(Array)
@@ -45,19 +50,21 @@ test('get - 200 /users/:id - find by email', () => {
 test('get - 200 /users/:id - find by id', () => {
     return request(address)
         .post('/users')
+        .set('Authorization', auth)
         .send({
             name: 'testeId',
             email: 'testeId@gmail.com',
             password: '123'
         })
         .then(response => request(address)
-        .get(`/users/${response.body._id}`)
-        .then(response => {
-            expect(response.status).toBe(200);
-            expect(response.body.name).toBe('testeId');
-            expect(response.body.email).toBe('testeId@gmail.com');
-            expect(response.body.password).toBeUndefined;
-        }))
+            .get(`/users/${response.body._id}`)
+            .set('Authorization', auth)
+            .then(response => {
+                expect(response.status).toBe(200);
+                expect(response.body.name).toBe('testeId');
+                expect(response.body.email).toBe('testeId@gmail.com');
+                expect(response.body.password).toBeUndefined;
+            }))
         .catch(fail);
 });
 
@@ -68,6 +75,7 @@ test('get - 200 /users/:id - find by id', () => {
 test('post - 200 /users', () => {
     return request(address)
         .post('/users')
+        .set('Authorization', auth)
         .send({
             name: 'usuário1',
             email: "usuario1@gmail.com",
@@ -87,6 +95,7 @@ test('post - 200 /users', () => {
 test('post - 400 /users - nome obrigatório', () => {
     return request(address)
         .post('/users')
+        .set('Authorization', auth)
         .send({
             email: 'testeobrigatorio@gmail.com',
             password: '12345',
@@ -104,6 +113,7 @@ test('post - 400 /users - nome obrigatório', () => {
 test('post - 400 /users - email obrigatório', () => {
     return request(address)
         .post('/users')
+        .set('Authorization', auth)
         .send({
             nome: 'testemail',
             password: '12345',
@@ -121,6 +131,7 @@ test('post - 400 /users - email obrigatório', () => {
 test('post - 400 /users - senha obrigatória', () => {
     return request(address)
         .post('/users')
+        .set('Authorization', auth)
         .send({
             name: 'usertest',
             email: 'testeobrigatorio@gmail.com',
@@ -137,6 +148,7 @@ test('post - 400 /users - senha obrigatória', () => {
 test('post - 400 /users - email duplicado', () => {
     return request(address)
         .post('/users')
+        .set('Authorization', auth)
         .send({
             name: 'usertest',
             email: 'testeobrigatorio@gmail.com',
@@ -145,6 +157,7 @@ test('post - 400 /users - email duplicado', () => {
         })
         .then(response => request(address)
             .post('/users')
+            .set('Authorization', auth)
             .send({
                 name: 'usertest',
                 email: 'testeobrigatorio@gmail.com',
@@ -161,6 +174,7 @@ test('post - 400 /users - email duplicado', () => {
 test('post - 400 /users - CPF inválido', () => {
     return request(address)
         .post('/users')
+        .set('Authorization', auth)
         .send({
             name: 'usertest',
             email: 'testeobrigatorio@gmail.com',
@@ -179,10 +193,12 @@ test('post - 400 /users - CPF inválido', () => {
 test('post - 400 /users - email inválido', () => {
     return request(address)
         .post('/users')
+        .set('Authorization', auth)
         .send({
             name: 'usertest',
             email: 'testeobrigatoricom',
-            password: '123',        })
+            password: '123',
+        })
         .then(response => {
             expect(response.status).toBe(400);
             expect(response.body.errors).toBeInstanceOf(Array)
@@ -194,6 +210,7 @@ test('post - 400 /users - email inválido', () => {
 test('post - 400 /users - nome inválido (menos de 3 caracteres)', () => {
     return request(address)
         .post('/users')
+        .set('Authorization', auth)
         .send({
             name: 'us',
             email: 'testeobrigatorio@gmail.com',
@@ -212,6 +229,7 @@ test('post - 400 /users - nome inválido (menos de 3 caracteres)', () => {
 test('post - 400 /users - nome inválido (mais de 80 caracteres)', () => {
     return request(address)
         .post('/users')
+        .set('Authorization', auth)
         .send({
             name: 'testeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee',
             email: 'testeobrigatorio@gmail.com',
@@ -230,6 +248,7 @@ test('post - 400 /users - nome inválido (mais de 80 caracteres)', () => {
 test('post - 200 /users/authenticate', () => {
     return request(address)
         .post('/users')
+        .set('Authorization', auth)
         .send({
             name: 'teste',
             email: 'testeauth@gmail.com',
@@ -238,16 +257,17 @@ test('post - 200 /users/authenticate', () => {
         })
         .then(response => request(address)
             .post('/users/authenticate')
+            .set('Authorization', auth)
             .send({
                 email: 'testeauth@gmail.com',
                 password: '123'
             })
             .then(response => {
-               expect(response.status).toBe(200); 
-               expect(response.body).toBeInstanceOf(Object);
-               expect(response.body.email).toBe('testeauth@gmail.com');
-               expect(response.body.name).toBe('teste');
-               expect(response.body._id).toBeDefined;
+                expect(response.status).toBe(200);
+                expect(response.body).toBeInstanceOf(Object);
+                expect(response.body.email).toBe('testeauth@gmail.com');
+                expect(response.body.name).toBe('teste');
+                expect(response.body._id).toBeDefined;
             }))
         .catch(fail);
 });
@@ -255,6 +275,7 @@ test('post - 200 /users/authenticate', () => {
 test('post - 403 /users/authenticate - invalid credentials', () => {
     return request(address)
         .post('/users')
+        .set('Authorization', auth)
         .send({
             name: 'teste',
             email: 'testeauth@gmail.com',
@@ -263,13 +284,14 @@ test('post - 403 /users/authenticate - invalid credentials', () => {
         })
         .then(response => request(address)
             .post('/users/authenticate')
+            .set('Authorization', auth)
             .send({
                 email: 'testeauth@gmail.com',
                 password: '1233'
             })
             .then(response => {
-               expect(response.status).toBe(403); 
-               expect(response.body.message).toContain('Invalid credentials');
+                expect(response.status).toBe(403);
+                expect(response.body.message).toContain('Invalid credentials');
             }))
         .catch(fail);
 });
@@ -281,6 +303,7 @@ test('post - 403 /users/authenticate - invalid credentials', () => {
 test('patch - 200 /users/:id', () => {
     return request(address)
         .post('/users')
+        .set('Authorization', auth)
         .send({
             name: 'usuario2',
             email: 'usuario2@email.com',
@@ -288,9 +311,10 @@ test('patch - 200 /users/:id', () => {
         })
         .then(response => request(address)
             .patch(`/users/${response.body._id}`)
+            .set('Authorization', auth)
             .send({
                 name: 'usuario2 - patch'
-        }))
+            }))
         .then(response => {
             expect(response.status).toBe(200);
             expect(response.body._id).toBeDefined();
@@ -303,9 +327,10 @@ test('patch - 200 /users/:id', () => {
 
 test('patch - 404 /users/aaaa - not found', () => {
     return request(address)
-            .patch(`/users/aaaa`)
-            .send({
-                name: 'usuario2 - patch'
+        .patch(`/users/aaaa`)
+        .set('Authorization', auth)
+        .send({
+            name: 'usuario2 - patch'
         })
         .then(response => {
             expect(response.status).toBe(404);
@@ -316,6 +341,7 @@ test('patch - 404 /users/aaaa - not found', () => {
 test('patch - 404 /users/:id - gender not found', () => {
     return request(address)
         .post('/users')
+        .set('Authorization', auth)
         .send({
             name: 'usuario2',
             email: 'usuario2@email.com',
@@ -324,9 +350,10 @@ test('patch - 404 /users/:id - gender not found', () => {
         })
         .then(response => request(address)
             .patch(`/users/${response.body._id}`)
+            .set('Authorization', auth)
             .send({
                 gender: 'non-binary'
-        }))
+            }))
         .then(response => {
             expect(response.status).toBe(404);
         })
@@ -340,16 +367,18 @@ test('patch - 404 /users/:id - gender not found', () => {
 test('del - 204 /users/:id', () => {
     return request(address)
         .post('/users')
+        .set('Authorization', auth)
         .send({
             name: 'usuario3',
             email: 'usuario3@gmail.com',
             password: '123'
         })
         .then(response => request(address)
-        .del(`/users/${response.body._id}`)
-        .send({
-            name: 'usuario3'
-        }))
+            .del(`/users/${response.body._id}`)
+            .set('Authorization', auth)
+            .send({
+                name: 'usuario3'
+            }))
         .then(response => {
             expect(response.status).toBe(204);
             expect(response.body.name).toBeUndefined();
@@ -360,11 +389,12 @@ test('del - 204 /users/:id', () => {
 
 test('del - 404 /users/aaaa - not found', () => {
     return request(address)
-    .delete('/users/aaaa')
-    .then(response => {
-        expect(response.status).toBe(404);
-    })
-    .catch(fail);
+        .delete('/users/aaaa')
+        .set('Authorization', auth)
+        .then(response => {
+            expect(response.status).toBe(404);
+        })
+        .catch(fail);
 });
 
 //#endregion === FIM TESTES DELETE === 
@@ -374,6 +404,7 @@ test('del - 404 /users/aaaa - not found', () => {
 test('put - 200 /users/:id - cpf indefinido', () => {
     return request(address)
         .post('/users')
+        .set('Authorization', auth)
         .send({
             name: 'testeput',
             email: 'testeput@gmail.com',
@@ -381,25 +412,27 @@ test('put - 200 /users/:id - cpf indefinido', () => {
             CPF: '959.322.110-75'
         })
         .then(response => request(address)
-        .put(`/users/${response.body._id}`)
-        .send({
-            name: 'novotesteput',
-            email: 'testeput@gmail.com',
-            password: '14786'
-        })
-        .then(response => {
-            expect(response.status).toBe(200);
-            expect(response.body.name).toBe('novotesteput');
-            expect(response.body.email).toBe('testeput@gmail.com');
-            expect(response.body.password).toBeUndefined();
-            expect(response.body.cpd).toBeUndefined();
-        }))
+            .put(`/users/${response.body._id}`)
+            .set('Authorization', auth)
+            .send({
+                name: 'novotesteput',
+                email: 'testeput@gmail.com',
+                password: '14786'
+            })
+            .then(response => {
+                expect(response.status).toBe(200);
+                expect(response.body.name).toBe('novotesteput');
+                expect(response.body.email).toBe('testeput@gmail.com');
+                expect(response.body.password).toBeUndefined();
+                expect(response.body.cpd).toBeUndefined();
+            }))
         .catch(fail);
 });
 
 test('put - 404 /users/aaaa - not found', () => {
     return request(address)
         .put(`/users/aaaa`)
+        .set('Authorization', auth)
         .send({
             name: 'novotesteput',
             email: 'testeput@gmail.com',
@@ -414,20 +447,22 @@ test('put - 404 /users/aaaa - not found', () => {
 test('put - 404 /users/:id - nome indefinido', () => {
     return request(address)
         .post('/users')
+        .set('Authorization', auth)
         .send({
             name: 'testeput',
             email: 'testeput@gmail.com',
             password: '14786',
         })
         .then(response => request(address)
-        .put(`/users/${response.body._id}`)
-        .send({
-            email: 'testeput@gmail.com',
-        })
-        .then(response => {
-            expect(response.status).toBe(404);
-            expect(response.body.name).toBeUndefined;
-        }))
+            .put(`/users/${response.body._id}`)
+            .set('Authorization', auth)
+            .send({
+                email: 'testeput@gmail.com',
+            })
+            .then(response => {
+                expect(response.status).toBe(404);
+                expect(response.body.name).toBeUndefined;
+            }))
         .catch(fail);
 });
 

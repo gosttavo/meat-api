@@ -12,7 +12,8 @@
   "jest": {
     "testRunner": "jest-jasmine2",
     "globals": {
-      "address": "http://localhost:3001"
+      "address": "http://localhost:3001",
+      "auth": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhZG1pbkBnbWFpbC5jb20iLCJpYXQiOjE1MTYyMzkwMjJ9.tBEEGy0mhY8te73dqRO8UN00brD40lFGp4M9w2i4xYw"
     },
     "testEnvironment": "node",
     "transform": {
