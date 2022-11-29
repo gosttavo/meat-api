@@ -52,7 +52,7 @@ class UserRouter extends ModelRouter<User> {
 
         //rota para adicionar usuários
         application.post(`${this.basePath}`,
-            [authorize('admin'),
+            [//authorize('admin'),
             this.doSave]);
 
         //rota para fazer update em usuários

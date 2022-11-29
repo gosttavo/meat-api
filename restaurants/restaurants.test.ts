@@ -13,7 +13,7 @@ test('get - 200 /restaurants', () => {
         .then(response => {
             expect(response.status).toBe(200);
             expect(response.body.items).toBeInstanceOf(Array);
-        }).catch(console.error);
+        }).catch(fail);
 });
 
 test('get - 404 /restaurants/aaaa - not found', () => {
@@ -22,7 +22,7 @@ test('get - 404 /restaurants/aaaa - not found', () => {
         .set('Authorization', auth)
         .then(response => {
             expect(response.status).toBe(404);
-        }).catch(console.error);
+        }).catch(fail);
 });
 
 test('get - 200 /restaurants/:id - find by id', () => {
@@ -39,7 +39,7 @@ test('get - 200 /restaurants/:id - find by id', () => {
                 expect(response.status).toBe(200);
                 expect(response.body.name).toBe('Teste Burger');
             }))
-        .catch(console.error);
+        .catch(fail);
 });
 
 //#endregion === FIM TESTES GET ===
@@ -62,7 +62,7 @@ test('post - 200 /restaurants', () => {
             expect(response.body.menu).toHaveLength(1)
             expect(response.body.menu[0]).toMatchObject({ name: "Coke", price: 5 })
         })
-        .catch(console.error);
+        .catch(fail);
 });
 
 test('post - 200 /restaurants - menu undefined', () => {
@@ -77,7 +77,7 @@ test('post - 200 /restaurants - menu undefined', () => {
             expect(response.body.name).toBe('Teste Burger');
             expect(response.body.menu).toBeUndefined;
         })
-        .catch(console.error);
+        .catch(fail);
 });
 
 //#endregion === FIM TESTES POST ===

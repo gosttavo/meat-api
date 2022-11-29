@@ -8,7 +8,7 @@ import * as mongoose from 'mongoose';
 import { mergePatchBodyParser } from './merge-path.parser';
 import { handleError } from './error.handler';
 import { tokenParser } from '../security/token.parser';
-import { logger } from '../common/logger';
+//import { logger } from '../common/logger';
 import corsMiddleware = require('restify-cors-middleware');
 
 export class Server {
@@ -19,9 +19,7 @@ export class Server {
     //método pra iniciar o mongo db
     doInitDatabase(): mongoose.MongooseThenable {
         (<any>mongoose).Promise = global.Promise;
-        return mongoose.connect(environment.db.url, {
-            useMongoClient: true
-        })
+        return mongoose.connect(environment.db.url)
     }
 
     //método para inicar as rotas/servidor
@@ -33,13 +31,15 @@ export class Server {
                 const options: restify.ServerOptions = {
                     name: 'meat-api',
                     version: '1.0.0',
-                    log: logger
+                    certificate: fs.readFileSync(environment.security.certificate),
+                    key: fs.readFileSync(environment.security.key)
+                    //log: logger
                 }
 
-                if (environment.security.enableHttps) {
-                    options.certificate = fs.readFileSync(environment.security.certificate),
-                        options.key = fs.readFileSync(environment.security.key)
-                } //habilitar certificado https
+                // if (environment.security.enableHttps) {
+                //     options.certificate = fs.readFileSync(environment.security.certificate),
+                //     options.key = fs.readFileSync(environment.security.key)
+                // } //habilitar certificado https
 
                 this.application = restify.createServer(options); //criar sv
 
@@ -49,7 +49,7 @@ export class Server {
 
                 const corsOptions: corsMiddleware.Options = { //habilitar CORS
                     preflightMaxAge: 10, //
-                    origins: ['http://localhost:4200'], //habilitar origens das requisições
+                    origins: ['http://localhost:4200'],  //habilitar origens das requisições
                     allowHeaders: ['authorization'], //headers permitidos
                     exposeHeaders: ['x-custom-header'] //
                 }
@@ -66,9 +66,9 @@ export class Server {
 
                 //#region === LOGGER ===
 
-                this.application.pre(restify.plugins.requestLogger({
-                    log: logger
-                }));
+                // this.application.pre(restify.plugins.requestLogger({
+                //     log: logger
+                // }));
 
                 //#endregion === FIM LOGGER ===
 

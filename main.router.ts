@@ -8,7 +8,8 @@ class MainRouter extends Router {
             resp.json({
                 users: '/users',
                 reviews: '/reviews',
-                restaurants: '/restaurants'
+                restaurants: '/restaurants',
+                orders: '/orders'
             });
         });
     }

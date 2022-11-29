@@ -10,8 +10,8 @@ export const environment = {
         saltRounds: process.env.SALT_ROUNDS || 10,
         apiSecret: process.env.API_SECRET || 'meat-api-secret',
         enableHttps: process.env.ENABLE_HTTPS || false,
-        certificate: process.env.CERTI_FILE || './security/keys/cert.pem',
-        key: process.env.CERTI_KEY_FILE || './security/keys/key.pem',
+        certificate: process.env.CERT_FILE || './security/keys/cert.pem',
+        key: process.env.CERT_KEY_FILE || './security/keys/key.pem',
     },
     log: {
         level: process.env.LOG_LEVEL || 'debug',

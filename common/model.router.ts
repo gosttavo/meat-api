@@ -6,7 +6,7 @@ export abstract class ModelRouter<D extends mongoose.Document> extends Router {
 
     basePath: string;
 
-    pageSize: number = 4;
+    pageSize: number = 6;
 
     constructor(protected model: mongoose.Model<D>) {
         super();
@@ -59,10 +59,13 @@ export abstract class ModelRouter<D extends mongoose.Document> extends Router {
     }
     //vai encontrar todos os modelos
     doFindAll = (req, resp, next) => {
+        console.log('=== findAll query ===', req.query);
+
         //vai receber a página da req, por padrão é 1
-        let page = parseInt(req.query._page || 1);
         //se a página for menor ou igual a 0 será 1
+        let page = parseInt(req.query._page || 1);
         page = page > 0 ? page : 1;
+
         //constante pra auxiliar na hora de skipar a página
         const skip = (page - 1) * this.pageSize;
 
@@ -81,6 +84,13 @@ export abstract class ModelRouter<D extends mongoose.Document> extends Router {
             .then(this.render(resp, next))
             .catch(next);
     }
+
+    // doFindBySeachTerm = (req, resp, next) => {
+    //     this.doPrepareOne(this.model.find({$text: {$search: req.query.q}}))
+    //         .then(this.render(resp,next))
+    //         .catch(next);
+    // }
+
     //salvar models
     doSave = (req, resp, next) => {
         //criar documento

@@ -14,7 +14,7 @@ test('get - 200 /reviews', () => {
         .then(response => {
             expect(response.status).toBe(200);
             expect(response.body.items).toBeInstanceOf(Array);
-        }).catch(console.error);
+        }).catch(fail);
 });
 
 test('get - 404 /reviews/aaaa - not found', () => {
@@ -23,7 +23,7 @@ test('get - 404 /reviews/aaaa - not found', () => {
         .set('Authorization', auth)
         .then(response => {
             expect(response.status).toBe(404);
-        }).catch(console.error)
+        }).catch(fail)
 });
 
 //#endregion === FIM TESTES GET ===
@@ -49,7 +49,7 @@ test('post - 200 /reviews', () => {
             expect(response.body.restaurant).toBeDefined;
             expect(response.body.user).toBeDefined;
         })
-        .catch(console.error);
+        .catch(fail);
 });
 
 test('post - 400 / - data obrigatória', () => {
@@ -65,7 +65,7 @@ test('post - 400 / - data obrigatória', () => {
         .then(response => {
             expect(response.status).toBe(400);
         })
-        .catch(console.error);
+        .catch(fail);
 });
 
 test('post - 400 / - rating obrigatório', () => {
@@ -81,7 +81,7 @@ test('post - 400 / - rating obrigatório', () => {
         .then(response => {
             expect(response.status).toBe(400);
         })
-        .catch(console.error);
+        .catch(fail);
 });
 
 //#endregion === FIM TESTES POST ===
