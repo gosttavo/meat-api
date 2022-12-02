@@ -16,12 +16,12 @@ class ReviewsRouter extends ModelRouter<Review>{
             .populate('restaurant') //popular restaurant;
     }
 
-    doEnvelope(document) {
-        let resource = super.doEnvelope(document);
-        const restaurantId = document.restaurant._id ? document.restaurant._id : document.restaurant;
-        resource._links.restaurant = `restaurant/${restaurantId}`;
-        return resource;
-    }
+    // doEnvelope(document) {
+    //     let resource = super.doEnvelope(document);
+    //     const restaurantId = document.restaurant._id ? document.restaurant._id : document.restaurant;
+    //     resource._links.restaurant = `restaurant/${restaurantId}`;
+    //     return resource;
+    // }
 
     //vai criar as rotas
     applyRoutes(application: restify.Server) {
@@ -31,8 +31,9 @@ class ReviewsRouter extends ModelRouter<Review>{
         application.get(`${this.basePath}/:id`, [this.doValidateId, this.doFindById]);
         //rota para adicionar usuários
         application.post(`${this.basePath}`,
-            [authorize('user'),
+            [authorize('admin', 'user'),
             this.doSave]);
+        application.del(`${this.basePath}/:id`, [this.doValidateId, this.doDelete]);
     }
 }
 

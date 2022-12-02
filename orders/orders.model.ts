@@ -1,8 +1,9 @@
 import * as mongoose from 'mongoose';
+import { Restaurant } from '../restaurants/restaurants.model';
 
 export interface OrderItems extends mongoose.Document {
     quantity: number, 
-    menuId: string, 
+    menuId: mongoose.Types.ObjectId | Restaurant,
     valueItem: number,
     name: string,
 }
@@ -25,7 +26,7 @@ const orderItemsSchema = new mongoose.Schema({
         required: true
     }, 
     menuId: {
-        type: String, 
+        type: mongoose.Schema.Types.ObjectId,
         required: true
     }, 
     valueItem: {
@@ -65,8 +66,12 @@ const orderSchema = new mongoose.Schema({
     orderItems: {
         type: [orderItemsSchema],
         required: true,
-        select: false,
         default: []
+    },
+    paymentOption: {
+        type: String,
+        enum: ['MON','DEB','CRED'],
+        required: true
     },
     delivery: {
         type: String,

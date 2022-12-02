@@ -12,27 +12,27 @@ class OrdersRouter extends ModelRouter<Order> {
 
     doEnvelope(document) {
         let resource = super.doEnvelope(document);
-        resource._links.menu = `${this.basePath}/${resource._id}/items`;
+        resource._links.items = `${this.basePath}/${resource._id}`;
         return resource;
     }
 
     doFindItems = (req, resp, next) => {
-        Order.findById(req.params.id,"+items")
-        .then(ord => {
-            if (!ord) {
-                throw new NotFoundError('Restaurant not found');
-            } else {
-                resp.json(ord.orderItems);
-                return next();
-            }
-        }).catch(next);
+        Order.findById(req.params.id, "+items")
+            .then(order => {
+                if (!order) {
+                    throw new NotFoundError('Orders not found');
+                } else {
+                    resp.json(order.orderItems);
+                    return next();
+                }
+            }).catch(next);
     }
 
     doReplaceItems = (req, resp, next) => {
         Order.findById(req.params.id)
             .then(ord => {
                 if (!ord) {
-                    throw new NotFoundError('Restaurant not found');
+                    throw new NotFoundError('Orders not found');
                 } else {
                     ord.orderItems = req.body; //ARRAY de MenuItem
                     return ord.save();

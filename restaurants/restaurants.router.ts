@@ -47,7 +47,7 @@ class RestaurantsRouter extends ModelRouter<Restaurant> {
     applyRoutes(application: restify.Server) {
 
         //rota de restaurants
-        application.get(`${this.basePath}`, this.doFindAll);
+        application.get(`${this.basePath}`, [this.doFindAll]);
 
         //rota de restaurants filtrados pelo id]
         application.get(`${this.basePath}/:id`,

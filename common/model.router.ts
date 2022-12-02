@@ -6,7 +6,9 @@ export abstract class ModelRouter<D extends mongoose.Document> extends Router {
 
     basePath: string;
 
-    pageSize: number = 6;
+    pageSize: number = 30;
+
+    actualPage: number;
 
     constructor(protected model: mongoose.Model<D>) {
         super();
@@ -24,6 +26,7 @@ export abstract class ModelRouter<D extends mongoose.Document> extends Router {
         resource._links.self = `${this.basePath}/${resource._id}`;
         return resource;
     }
+
     //vai envelopar as informaçõs de contagem de páginas
     doEnvelopeAll(documents: any[], options: any = {}): any {
         const resource: any = {
@@ -49,6 +52,7 @@ export abstract class ModelRouter<D extends mongoose.Document> extends Router {
 
         return resource;
     }
+
     //validar object id
     doValidateId = (req, resp, next) => {
         if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
@@ -57,39 +61,53 @@ export abstract class ModelRouter<D extends mongoose.Document> extends Router {
             next();
         }
     }
+
+    doPagination = (actualPage) => {
+        //vai receber a página da req, por padrão é 1
+        //se a página for menor ou igual a 0 será 1
+        let page = parseInt(actualPage || 1);
+        page = page > 0 ? page : 1;
+
+        return page;
+    }
+
+    //auxiliar pra skipar a página
+    createSkip(page) {
+        const skip = (page - 1) * this.pageSize;
+
+        return skip;
+    }
+
+
     //vai encontrar todos os modelos
     doFindAll = (req, resp, next) => {
         console.log('=== findAll query ===', req.query);
 
-        //vai receber a página da req, por padrão é 1
-        //se a página for menor ou igual a 0 será 1
-        let page = parseInt(req.query._page || 1);
-        page = page > 0 ? page : 1;
+        this.actualPage = req.query._page;
 
-        //constante pra auxiliar na hora de skipar a página
-        const skip = (page - 1) * this.pageSize;
+        let page = this.doPagination(this.actualPage);
+        let skip = this.createSkip(page);
+
+        //const {q, _page} = req.query;
+        let search = req.query.q !== undefined ? {$text: { $search: req.query.q } }  :  undefined ;
 
         //vai contar as páginas
         this.model.count({}).exec().then(count => this.model
-            .find()
+            .find(search)
             .skip(skip)
             .limit(this.pageSize)
             .then(this.renderAll(resp, next, {
                 page, count, pageSize: this.pageSize, url: req.url
             }))).catch(next);
+
     }
+
     //filtrar models pelo id
     doFindById = (req, resp, next) => {
         this.doPrepareOne(this.model.findById(req.params.id))
             .then(this.render(resp, next))
             .catch(next);
     }
-
-    // doFindBySeachTerm = (req, resp, next) => {
-    //     this.doPrepareOne(this.model.find({$text: {$search: req.query.q}}))
-    //         .then(this.render(resp,next))
-    //         .catch(next);
-    // }
 
     //salvar models
     doSave = (req, resp, next) => {
@@ -99,6 +117,7 @@ export abstract class ModelRouter<D extends mongoose.Document> extends Router {
             .then(this.render(resp, next))
             .catch(next);
     }
+
     //substituir models
     doReplace = (req, resp, next) => {
         const options = {
@@ -118,6 +137,7 @@ export abstract class ModelRouter<D extends mongoose.Document> extends Router {
             .then(this.render(resp, next))
             .catch(next);
     }
+
     //atualizar models
     doUpdate = (req, resp, next) => {
         //constante para mandar o documento novo p/ ser modificado
@@ -127,6 +147,7 @@ export abstract class ModelRouter<D extends mongoose.Document> extends Router {
             .then(this.render(resp, next))
             .catch(next);
     }
+
     //deletar models
     doDelete = (req, resp, next) => {
         this.model.remove({ _id: req.params.id }).exec().then((cmdResult: any) => {
