@@ -30,9 +30,8 @@ class ReviewsRouter extends ModelRouter<Review>{
         //rota de usuários filtrados pelo id]
         application.get(`${this.basePath}/:id`, [this.doValidateId, this.doFindById]);
         //rota para adicionar usuários
-        application.post(`${this.basePath}`,
-            [authorize('admin', 'user'),
-            this.doSave]);
+        application.post(`${this.basePath}`, [authorize('admin', 'user'), this.doSave]);
+        //rota de delete
         application.del(`${this.basePath}/:id`, [this.doValidateId, this.doDelete]);
     }
 }

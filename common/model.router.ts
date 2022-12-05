@@ -111,8 +111,12 @@ export abstract class ModelRouter<D extends mongoose.Document> extends Router {
 
     //salvar models
     doSave = (req, resp, next) => {
+
+        console.log('=== save body ===', req.body);
+
         //criar documento
         let document = new this.model(req.body);
+
         document.save()
             .then(this.render(resp, next))
             .catch(next);

@@ -22,6 +22,7 @@ export const authenticate: restify.RequestHandler = (req, resp, next) => {
 
             //resposta + token acesso
             resp.json({
+                id: user.id,
                 name: user.name,
                 email: user.email,
                 accessToken: token
