@@ -28,6 +28,12 @@ const userSchema = new mongoose.Schema({
         maxlength: 80,
         minlength: 3
     },
+    lastName: {
+        type: String,
+        required: true,
+        maxlength: 120,
+        minlength: 5
+    },
     email: {
         type: String,
         unique: true,
@@ -37,7 +43,8 @@ const userSchema = new mongoose.Schema({
     password: {
         type: String,
         select: false,
-        required: true
+        required: true,
+        minlegth: 8
     },
     gender: {
         type: String,
@@ -46,6 +53,7 @@ const userSchema = new mongoose.Schema({
     },
     cpf: {
         type: String,
+        unique: true,
         required: false,
         validate: {
             validator: doValidateCPF,
