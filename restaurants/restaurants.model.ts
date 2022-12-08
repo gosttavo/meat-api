@@ -53,7 +53,7 @@ const restaurantSchema = new mongoose.Schema({
     },
     rating: {
         type: Number,
-        required: true,
+        required: false,
     },
     imagePath: {
         type: String,
