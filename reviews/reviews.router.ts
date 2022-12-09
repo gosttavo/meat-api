@@ -1,4 +1,5 @@
 import * as restify from 'restify';
+import * as mongoose from 'mongoose';
 
 import { ModelRouter } from '../common/model.router';
 import { Review } from './reviews.model';
@@ -17,18 +18,18 @@ class ReviewsRouter extends ModelRouter<Review>{
     }
 
     doCalculateAverageRestaurantRating = async (req, resp, next) => {
-        console.log(req.params.id);
+        console.log(req.params.body.restaurant);
 
-        let id: string = req.params.id;
+        let restId = req.params.body.restaurant;
 
         const hasFind = await Review.aggregate([
-            { $match: { restaurant: Object(id) } },
+            { $match: { restaurant: new mongoose.Types.ObjectId(restId)} },
             { $group: { _id: "$restaurant", average: { $avg: "$rating" } } }
         ])
 
         console.log('média', hasFind)
     }
-
+//
     applyRoutes(application: restify.Server) {
 
         application.get(`${this.basePath}`,
@@ -48,6 +49,7 @@ class ReviewsRouter extends ModelRouter<Review>{
 
         application.post(`${this.basePath}`,
             [authorize('admin', 'user'),
+            this.doCalculateAverageRestaurantRating,
             this.doSave]);
 
         application.del(`${this.basePath}/:id`,
