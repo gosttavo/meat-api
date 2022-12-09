@@ -16,12 +16,17 @@ class ReviewsRouter extends ModelRouter<Review>{
             .catch(next);
     }
 
-    doCalculateAverageRestaurantRating = (req, resp, next) => {
-        Review.aggregate([
-            { $match: { restaurant: req.params.id } },
+    doCalculateAverageRestaurantRating = async (req, resp, next) => {
+        console.log(req.params.id);
+
+        let id: string = req.params.id;
+
+        const hasFind = await Review.aggregate([
+            { $match: { restaurant: Object(id) } },
             { $group: { _id: "$restaurant", average: { $avg: "$rating" } } }
-        ]).then(this.render(resp, next))
-            .catch(next);
+        ])
+
+        console.log('média', hasFind)
     }
 
     applyRoutes(application: restify.Server) {
@@ -37,9 +42,12 @@ class ReviewsRouter extends ModelRouter<Review>{
             [this.doValidateId,
             this.doFindReviewByRestaurantId]);
 
+            application.get(`${this.basePath}/:id/rating`,
+            [this.doValidateId,
+            this.doCalculateAverageRestaurantRating]);
+
         application.post(`${this.basePath}`,
             [authorize('admin', 'user'),
-            this.doCalculateAverageRestaurantRating,
             this.doSave]);
 
         application.del(`${this.basePath}/:id`,
