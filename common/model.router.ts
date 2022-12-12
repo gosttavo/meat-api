@@ -6,7 +6,7 @@ export abstract class ModelRouter<D extends mongoose.Document> extends Router {
 
     basePath: string;
 
-    pageSize: number = 30;
+    pageSize: number = 4;
 
     actualPage: number;
 
@@ -78,28 +78,20 @@ export abstract class ModelRouter<D extends mongoose.Document> extends Router {
         return skip;
     }
 
-
     //vai encontrar todos os modelos
     doFindAll = (req, resp, next) => {
-        console.log('=== findAll query ===', req.query);
-
         this.actualPage = req.query._page;
 
         let page = this.doPagination(this.actualPage);
         let skip = this.createSkip(page);
 
-        //const {q, _page} = req.query;
-        let search = req.query.q !== undefined ? {$text: { $search: req.query.q } }  :  undefined ;
-
-        //vai contar as páginas
         this.model.count({}).exec().then(count => this.model
-            .find(search)
+            .find()
             .skip(skip)
             .limit(this.pageSize)
             .then(this.renderAll(resp, next, {
                 page, count, pageSize: this.pageSize, url: req.url
             }))).catch(next);
-
     }
 
     //filtrar models pelo id
@@ -111,7 +103,6 @@ export abstract class ModelRouter<D extends mongoose.Document> extends Router {
 
     //salvar models
     doSave = (req, resp, next) => {
-
         console.log('=== save body ===', req.body);
 
         //criar documento

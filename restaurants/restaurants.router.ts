@@ -43,11 +43,40 @@ class RestaurantsRouter extends ModelRouter<Restaurant> {
             }).catch(next);
     }
 
+    doFindAllRestaurants = (req, resp, next) => {
+        console.log('=== doFindAllRestaurants ===', req.query);
+
+        if (req.query.q === undefined || req.query.q === 'undefined') {
+            this.doFindByFilter(req, resp, next);
+        } else {
+            let search = { $text: { $search: req.query.q } };
+
+            this.doFindByFilter(req, resp, next, search);
+        }
+    }
+
+    doFindByFilter = (req, resp, next, search?) => {
+        console.log("===doFindByFilter===", search)
+
+        this.actualPage = req.query._page;
+
+        let page = this.doPagination(this.actualPage);
+        let skip = this.createSkip(page);
+
+        this.model.count({}).exec().then(count => this.model
+            .find(search)
+            .skip(skip)
+            .limit(this.pageSize)
+            .then(this.renderAll(resp, next, {
+                page, count, pageSize: this.pageSize, url: req.url
+            }))).catch(next);
+    }
+
     //vai criar as rotas
     applyRoutes(application: restify.Server) {
 
         //rota de restaurants
-        application.get(`${this.basePath}`, [this.doFindAll]);
+        application.get(`${this.basePath}`, [this.doFindAllRestaurants]);
 
         //rota de restaurants filtrados pelo id]
         application.get(`${this.basePath}/:id`,

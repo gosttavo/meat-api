@@ -16,53 +16,33 @@ class OrdersRouter extends ModelRouter<Order> {
         return resource;
     }
 
-    doFindItems = (req, resp, next) => {
-        Order.findById(req.params.id, "+items")
-            .then(order => {
-                if (!order) {
-                    throw new NotFoundError('Orders not found');
-                } else {
-                    resp.json(order.orderItems);
-                    return next();
-                }
-            }).catch(next);
-    }
-
-    doReplaceItems = (req, resp, next) => {
-        Order.findById(req.params.id)
-            .then(ord => {
-                if (!ord) {
-                    throw new NotFoundError('Orders not found');
-                } else {
-                    ord.orderItems = req.body; //ARRAY de MenuItem
-                    return ord.save();
-                }
-            }).then(ord => {
-                resp.json(ord.orderItems);
-                return next();
-            }).catch(next);
+    doFindOrderByUserEmail = (req, resp, next) => {
+        console.log('===Email===', req.params.id);
+        Order.find({ email: req.params.id })
+            .then(this.renderAll(resp, next))
+            .catch(next);
     }
 
     applyRoutes(application: restify.Server) {
 
-        application.get(`${this.basePath}`, this.doFindAll);
+        application.get(`${this.basePath}/:id`, this.doFindOrderByUserEmail);
 
         application.post(`${this.basePath}`, 
             [authorize('admin', 'user'), 
             this.doSave]);
 
-        application.get(`${this.basePath}/:id`,
-            [this.doValidateId,
-            this.doFindById]);
+        // application.get(`${this.basePath}/:id`,
+        //     [this.doValidateId,
+        //     this.doFindOrderByUserEmail]);
 
-        application.get(`${this.basePath}/:id/items`,
-            [this.doValidateId,
-            this.doFindItems]);
+        // application.get(`${this.basePath}/:id/items`,
+        //     [this.doValidateId,
+        //     this.doFindItems]);
 
-        application.put(`${this.basePath}/:id/items`,
-            [authorize('admin'),
-            this.doValidateId,
-            this.doReplaceItems]);
+        // application.put(`${this.basePath}/:id/items`,
+        //     [authorize('admin'),
+        //     this.doValidateId,
+        //     this.doReplaceItems]);
     }
 
 }
