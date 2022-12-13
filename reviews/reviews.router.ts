@@ -22,6 +22,7 @@ class ReviewsRouter extends ModelRouter<Review>{
         let restId = req.body.restaurant;
 
         this.doSave(req, resp, next);
+
         this.doCalculateAverageRestaurantRating(restId);
     }
 

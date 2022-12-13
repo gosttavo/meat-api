@@ -2,7 +2,7 @@ import * as mongoose from 'mongoose';
 import { Restaurant } from '../restaurants/restaurants.model';
 
 export interface OrderItems extends mongoose.Document {
-    quantity: number, 
+    quantity: number,
     menuId: mongoose.Types.ObjectId | Restaurant,
     valueItem: number,
     name: string,
@@ -24,32 +24,26 @@ const orderItemsSchema = new mongoose.Schema({
     quantity: {
         type: Number,
         required: true
-    }, 
+    },
     menuId: {
         type: mongoose.Schema.Types.ObjectId,
         required: true
-    }, 
+    },
     valueItem: {
         type: Number,
         required: true
-    }, 
+    },
     name: {
-        type: String, 
+        type: String,
         required: true
     }
 })
 
 const orderSchema = new mongoose.Schema({
-    name: {
-        type: String,
-        required: true,
-        maxlength: 80,
-        minlength: 3
-    },
-    email: {
-        type: String,
-        required: true,
-        match: /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/
+    user: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+        required: true
     },
     address: {
         type: String,
@@ -59,7 +53,7 @@ const orderSchema = new mongoose.Schema({
         type: Number,
         required: true,
     },
-    optionalAddress:{
+    optionalAddress: {
         type: String,
         required: false
     },
@@ -70,14 +64,22 @@ const orderSchema = new mongoose.Schema({
     },
     paymentOption: {
         type: String,
-        enum: ['MON','DEB','CRED'],
+        enum: ['MON', 'DEB', 'CRED', 'PIX'],
         required: true
     },
     delivery: {
         type: String,
         required: false
     },
-    totalOrder:{
+    date: {
+        type: Date,
+        required: true,
+    },
+    rating: {
+        type: Number,
+        required: false
+    },
+    totalOrder: {
         type: Number,
         required: true
     }

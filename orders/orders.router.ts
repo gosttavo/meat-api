@@ -16,28 +16,36 @@ class OrdersRouter extends ModelRouter<Order> {
         return resource;
     }
 
-    doFindOrderByUserEmail = (req, resp, next) => {
-        console.log('===Email===', req.params.id);
-        Order.find({ email: req.params.id })
+    doFindOrderByUserId = (req, resp, next) => {
+        console.log('===User Id===', req.params.id);
+        Order.find({ user: req.params.id })
             .then(this.renderAll(resp, next))
             .catch(next);
     }
 
     applyRoutes(application: restify.Server) {
 
-        application.get(`${this.basePath}/:id`, this.doFindOrderByUserEmail);
-
         application.post(`${this.basePath}`, 
             [authorize('admin', 'user'), 
             this.doSave]);
 
-        // application.get(`${this.basePath}/:id`,
-        //     [this.doValidateId,
-        //     this.doFindOrderByUserEmail]);
+        application.get(`${this.basePath}`,
+            [authorize('admin'),
+            this.doFindAll]);
 
-        // application.get(`${this.basePath}/:id/items`,
-        //     [this.doValidateId,
-        //     this.doFindItems]);
+        application.get(`${this.basePath}/:id`,
+            [authorize('admin', 'user'),
+            this.doValidateId,
+            this.doFindById]);
+
+        application.get(`${this.basePath}/historic/:id`, 
+            [this.doValidateId,
+            this.doFindOrderByUserId]);
+
+        application.patch(`${this.basePath}/:id`,
+            [authorize('admin', 'user'), 
+            this.doValidateId,
+            this.doUpdate]);
 
         // application.put(`${this.basePath}/:id/items`,
         //     [authorize('admin'),

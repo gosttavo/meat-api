@@ -6,7 +6,7 @@ export abstract class ModelRouter<D extends mongoose.Document> extends Router {
 
     basePath: string;
 
-    pageSize: number = 4;
+    pageSize: number = 6;
 
     actualPage: number;
 
