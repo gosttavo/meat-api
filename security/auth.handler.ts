@@ -18,12 +18,13 @@ export const authenticate: restify.RequestHandler = (req, resp, next) => {
                 sub: user.email,
                 iss: 'meat-api'
             },
-                environment.security.apiSecret);
+            environment.security.apiSecret);
 
             //resposta + token acesso
             resp.json({
                 id: user.id,
                 name: user.name,
+                lastName: user.lastName,
                 email: user.email,
                 accessToken: token
             });

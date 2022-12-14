@@ -6,6 +6,7 @@ import { environment } from '../common/environment';
 
 export interface User extends mongoose.Document {
     name: string,
+    lastName: string,
     email: string,
     password: string
     cpf: string,

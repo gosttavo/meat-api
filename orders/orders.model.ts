@@ -40,6 +40,10 @@ const orderItemsSchema = new mongoose.Schema({
 })
 
 const orderSchema = new mongoose.Schema({
+    userName:{
+        type: String,
+        required: true
+    },
     user: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
